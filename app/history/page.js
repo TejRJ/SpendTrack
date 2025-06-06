@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Navbar from '@/components/navbar';
 import { TrashIcon } from '@heroicons/react/24/outline';
+import { toast } from 'react-toastify';
 
 const baseCategories = ['Food', 'Transport', 'Groceries', 'Utilities', 'Entertainment', 'Other'];
 const categories = ['All', ...baseCategories];
@@ -19,6 +20,8 @@ export default function HistoryPage() {
   const [category, setCategory] = useState('All');
   const [results, setResults] = useState([]);
   const [total, setTotal] = useState(0);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -38,23 +41,29 @@ export default function HistoryPage() {
       const sum = data.spendings.reduce((acc, curr) => acc + curr.amount, 0);
       setTotal(sum);
     } else {
-      alert('Error fetching data');
+      toast.error('Error fetching data');
     }
   };
 
   const deleteSpending = async (id) => {
-    if (!confirm('Are you sure you want to delete this spending?')) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/spendings`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
 
-    const res = await fetch(`/api/spendings`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    });
-
-    if (res.ok) {
-      setResults(results.filter((item) => item._id !== id));
-    } else {
-      alert('Failed to delete spending');
+      if (res.ok) {
+        setResults(results.filter((item) => item._id !== id));
+      } else {
+        toast.error('Failed to delete spending');
+      }
+    } catch (err) {
+      toast.error('Error occurred during deletion');
+    } finally {
+      setDeletingId(null);
+      setConfirmDeleteId(null);
     }
   };
 
@@ -121,13 +130,32 @@ export default function HistoryPage() {
                         key={item._id}
                         className="relative border border-white/20 bg-white/5 rounded-md p-4 text-white min-h-[90px]"
                       >
-                        <button
-                          onClick={() => deleteSpending(item._id)}
-                          className="absolute top-2 right-2 hover:text-red-600 p-1"
-                          title="Delete Entry"
-                        >
-                          <TrashIcon className="h-5 w-5" />
-                        </button>
+                        {confirmDeleteId === item._id ? (
+                          <div className="absolute top-2 right-2 space-x-2">
+                            <button
+                              onClick={() => deleteSpending(item._id)}
+                              className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 text-sm rounded"
+                              disabled={deletingId === item._id}
+                            >
+                              {deletingId === item._id ? 'Deleting...' : 'Confirm'}
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteId(null)}
+                              className="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 text-sm rounded"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteId(item._id)}
+                            className="absolute top-2 right-2 hover:text-red-600 p-1"
+                            title="Delete Entry"
+                          >
+                            <TrashIcon className="h-5 w-5" />
+                          </button>
+                        )}
+
                         <div className="font-medium">₹{item.amount}</div>
                         <div className="text-sm text-gray-300">{item.date}</div>
                         {item.category && (

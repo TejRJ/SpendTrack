@@ -49,10 +49,16 @@ export default function AddSpendingPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const parsedAmount = parseFloat(amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
+      toast.error('Please enter a valid positive amount');
+      return;
+    }
+
     const res = await fetch('/api/spendings', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date, amount, description, category }),
+      body: JSON.stringify({ date, amount: parsedAmount, description, category }),
     });
 
     if (res.ok) {
@@ -90,6 +96,8 @@ export default function AddSpendingPage() {
               <label className="block text-sm text-gray-200 mb-1">Amount (₹)</label>
               <input
                 type="number"
+                min="0"
+                step="0.01"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 required
