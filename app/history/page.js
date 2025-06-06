@@ -55,7 +55,15 @@ export default function HistoryPage() {
       });
 
       if (res.ok) {
-        setResults(results.filter((item) => item._id !== id));
+        // Remove deleted item from results
+        const newResults = results.filter((item) => item._id !== id);
+        setResults(newResults);
+
+        // Update total immediately after deletion
+        const newTotal = newResults.reduce((acc, curr) => acc + curr.amount, 0);
+        setTotal(newTotal);
+
+        toast.success('Spending deleted successfully');
       } else {
         toast.error('Failed to delete spending');
       }
