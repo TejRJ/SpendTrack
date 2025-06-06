@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
           <Background />
           {children}
           <a
-            href="https://github.com/TejRJ"
+            href="https://www.linkedin.com/in/tej-jikadara-20413231a/"
             target="_blank"
             rel="noopener noreferrer"
             className="fixed bottom-4 right-4 z-50 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg transition"
