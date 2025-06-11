@@ -81,7 +81,7 @@ export default function AddSpendingPage() {
           style={{ marginTop }}
           className="bg-white/10 backdrop-blur-md rounded-xl shadow-lg w-full max-w-md p-8 text-white mx-auto"
         >
-          <h1 className="text-2xl font-bold mb-6 text-center">Add Spendings</h1>
+          <h1 className="text-2xl font-bold mb-6 text-center">Add Spending</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm text-gray-200 mb-1">Date</label>

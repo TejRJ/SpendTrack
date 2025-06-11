@@ -177,7 +177,7 @@ export default function HistoryPage() {
                   </ul>
                 ) : (
                   <div className="flex-1 pt-[45px] text-2xl flex items-center justify-center text-center text-gray-400">
-                    No spendings are there
+                    No spending history available
                   </div>
                 )}
               </div>
